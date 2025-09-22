@@ -41,10 +41,11 @@ jobs:
       - name: Configure CMake
         run: |
           cmake -B build-${{ matrix.abi }} \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DANDROID_ABI=${{ matrix.abi }} \
-            -DANDROID_PLATFORM=android-24 \
-            -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake
+          -DCMAKE_BUILD_TYPE=Release \
+          -DANDROID_ABI=${{ matrix.abi }} \
+          -DANDROID_PLATFORM=android-24 \
+          -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
+          -DLLAMA_CURL=OFF
 
       # 7. Build
       - name: Build
