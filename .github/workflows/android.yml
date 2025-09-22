@@ -1,0 +1,50 @@
+name: Build llama.cpp for Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        abi: [armeabi-v7a, arm64-v8a, x86, x86_64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install latest NDK
+        run: sdkmanager --install "ndk;latest"
+
+      - name: Configure environment
+        run: echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/$(ls $ANDROID_SDK_ROOT/ndk | sort -V | tail -n 1)" >> $GITHUB_ENV
+
+      - name: Configure CMake
+        run: |
+          cmake -B build-${{ matrix.abi }} \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DANDROID_ABI=${{ matrix.abi }} \
+            -DANDROID_PLATFORM=android-24 \
+            -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake
+
+      - name: Build
+        run: cmake --build build-${{ matrix.abi }} -j
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: llama-${{ matrix.abi }}
+          path: build-${{ matrix.abi }}/*.so
