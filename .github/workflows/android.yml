@@ -47,6 +47,7 @@ jobs:
           -DCMAKE_C_FLAGS="-march=armv8.7a" \
           -DCMAKE_CXX_FLAGS="-march=armv8.7a" \
           -DGGML_OPENMP=OFF \
+          -DBUILD_SHARED_LIBS=ON \
           -DGGML_LLAMAFILE=OFF \
           -DLLAMA_CURL=OFF \
           -B build-android
